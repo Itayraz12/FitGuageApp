@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "491949011998-3s7m0om9qum1m0tcpcqstgm23em4302u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fitgaugeproject",
+            "certificate_hash": "7ed971fb0dd434b98771c061b97871b97c15b195"
+          }
+        },
+        {
           "client_id": "491949011998-68jdrj54nui2ni735rui1bdlfi7jhk1d.apps.googleusercontent.com",
           "client_type": 3
         }

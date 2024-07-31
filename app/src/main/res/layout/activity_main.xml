@@ -1,20 +1,57 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/backround_image"
     tools:context=".MainActivity">
 
-    <!-- Other UI elements -->
+    <ImageView
+        android:id="@+id/main_IMG_image"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/ic_default_user" />
+
+    <TextView
+        android:id="@+id/main_LBL_welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_IMG_image"
+        android:textColor="@color/white"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="Welcome, User!" />
+
+    <Button
+        android:id="@+id/btn_training_plan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_LBL_welcome"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="My training plan" />
+
+    <Button
+        android:id="@+id/btn_gym_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_training_plan"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="My gym status" />
 
     <Button
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Logout"
-        android:textColor="@android:color/white"
+        android:layout_below="@id/btn_gym_status"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
         android:background="@android:color/black"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="16dp"/>
+        android:text="Logout"
+        android:textColor="@android:color/white" />
 </RelativeLayout>
