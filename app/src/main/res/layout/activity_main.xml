@@ -36,10 +36,19 @@
         android:text="My training plan" />
 
     <Button
-        android:id="@+id/btn_gym_status"
+        android:id="@+id/btn_edit_workouts"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/btn_training_plan"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Edit my training plan" />
+
+    <Button
+        android:id="@+id/btn_gym_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_edit_workouts"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="My gym status" />
@@ -51,7 +60,7 @@
         android:layout_below="@id/btn_gym_status"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:background="@android:color/black"
+
         android:text="Logout"
         android:textColor="@android:color/white" />
 </RelativeLayout>

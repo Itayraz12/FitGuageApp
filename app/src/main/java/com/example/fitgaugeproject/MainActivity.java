@@ -18,6 +18,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     private Button btnLogout;
+    private Button  btnEditPlan;
     private Button btnTrainingPlan;
     private Button btnGymStatus;
     private ImageView main_IMG_image;
@@ -47,6 +48,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        btnEditPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate to Training Plan Activity
+                Intent intent = new Intent(MainActivity.this, EditMyWorkoutsActivity.class);
+                startActivity(intent);
+            }
+        });
+
         btnGymStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         main_IMG_image = findViewById(R.id.main_IMG_image);
         main_LBL_welcome = findViewById(R.id.main_LBL_welcome);
         btnLogout = findViewById(R.id.btn_logout);
+        btnEditPlan = findViewById(R.id.btn_edit_workouts);
         btnTrainingPlan = findViewById(R.id.btn_training_plan);
         btnGymStatus = findViewById(R.id.btn_gym_status);
     }

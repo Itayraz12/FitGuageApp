@@ -49,6 +49,7 @@ dependencies {
     //fireBase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+    implementation(libs.firebase.database)
 
     //firebase Authentication
     implementation (libs.firebase.ui.auth)
@@ -60,7 +61,7 @@ dependencies {
     implementation (libs.glide)
 
     //Lottie:
-    implementation("com.airbnb.android:lottie-compose:6.4.1")
+    implementation(libs.lottie.compose)
 
 
 }
