@@ -7,46 +7,149 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="32dp"
+    android:background="@drawable/backround_image"
     tools:context=".EditMyWorkoutsActivity">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/main_LBL_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Add new exercise"
         android:gravity="center"
-        android:textSize="50sp"
+        android:textSize="30sp"
         android:textStyle="bold"
         android:layout_marginVertical="10dp"
-        android:textColor="@color/black" />
+        android:textColor="@color/amber_300" />
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/main_ET_text"
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/main_LBL_choose_workout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Insert Text To Show As Title"
-        android:inputType="text"/>
+        android:text="@string/choose_workout"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/black"
+        android:textColor="@color/red_300"/>
+
+    <Spinner
+        android:id="@+id/main_SP_workouts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/spinner_background"
+        android:padding="8dp" />
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- First Text Field: Exercise Name -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:hint="Insert new exercise name"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxStrokeColor="@color/colorAccent"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/main_ET_text_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:inputType="text"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:background="@null"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Second Text Field: Number of Sets -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:hint="Number of sets"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxStrokeColor="@color/colorAccent"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/main_ET_text_sets"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:inputType="number"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:background="@null"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Third Text Field: Number of Repetitions -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:hint="Number of repetitions"
+            app:boxBackgroundColor="@android:color/white"
+            app:boxStrokeColor="@color/colorAccent"
+            app:boxCornerRadiusTopStart="8dp"
+            app:boxCornerRadiusTopEnd="8dp"
+            app:boxCornerRadiusBottomStart="8dp"
+            app:boxCornerRadiusBottomEnd="8dp"
+            app:boxStrokeWidth="2dp"
+            app:boxStrokeWidthFocused="3dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/main_ET_text_repetitions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:inputType="number"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:background="@null"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/main_BTN_updateTitle"
+        android:id="@+id/main_BTN_updateWorkout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="10dp"
-        android:text="Update Title" />
+        android:text="Submit new exercise" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/main_BTN_save"
+        android:id="@+id/main_BTN_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="10dp"
-        android:text="Save Data" />
+        android:text="Back" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/main_BTN_load"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginVertical="10dp"
-        android:text="Load Data" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/main_LBL_data"

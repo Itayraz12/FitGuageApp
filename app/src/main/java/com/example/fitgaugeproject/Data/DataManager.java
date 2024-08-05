@@ -13,7 +13,7 @@ public class DataManager {
                         new workout()
                                 .setIsDone(false)
                                 .setType(workout.WorkOutType.STRENGTH_TRAINING)
-                                .addExercise(new exercise("banch presss",3,12)));
+                                .addExercise(new exercise("bench presses",3,12)));
 
 
 
