@@ -20,13 +20,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.example.fitgaugeproject.Models.Gym;
 
 import java.util.ArrayList;
 
 public class EditMyWorkoutsActivity extends AppCompatActivity {
 
     private Spinner main_SP_workouts;
-    private ArrayList<String> workoutNames = new ArrayList<>(); // Ensure this is initialized
+    private ArrayList<String> workoutNames = new ArrayList<>();
     private TextInputEditText main_ET_text_name;
     private MaterialTextView main_LBL_title;
     private MaterialButton main_BTN_back;
@@ -164,20 +165,22 @@ public class EditMyWorkoutsActivity extends AppCompatActivity {
 
 
 
-    private void setLabel(String string) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference titleRef = database.getReference("title");
-
-        titleRef.setValue(string);
-    }
+//    private void setLabel(String string) {
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        DatabaseReference titleRef = database.getReference("title");
+//
+//        titleRef.setValue(string);
+//    }
 
     private void saveDataToFirebase() {
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference garageRef = database.getReference("Week of workouts");
+        DatabaseReference WorkoutsRef = database.getReference("Week of workouts");
 
-        garageRef.setValue(DataManager.createWeekOfWorkouts());
+        WorkoutsRef.setValue(DataManager.createWeekOfWorkouts());
     }
+
+
 
     private void findViews() {
         main_BTN_submit = findViewById(R.id.main_BTN_updateWorkout);

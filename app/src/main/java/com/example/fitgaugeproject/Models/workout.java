@@ -6,6 +6,7 @@ import java.util.List;
 public class workout {
 
         public enum WorkOutType{
+            TRX,
             FUNCTIONAL_TRAINING,
             STRENGTH_TRAINING,
             HYBRID,
