@@ -1,14 +1,21 @@
 package com.example.fitgaugeproject;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,13 +27,17 @@ import com.google.firebase.database.ValueEventListener;
 
 public class GymStatusActivity extends AppCompatActivity {
 
+    private static final String TAG = "GymStatusActivity";
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+
     private TextView gymNameTextView;
     private TextView gymTraineesTextView;
     private TextView gymTraineesLargeTextView;
     private LottieAnimationView lottieGauge;
+    private Button navigateButton;
+    private Double gymLatitude;
+    private Double gymLongitude;
     private Long previousTraineesCount = null;
-
-    private static final String TAG = "GymStatusActivity";
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -39,6 +50,10 @@ public class GymStatusActivity extends AppCompatActivity {
         gymTraineesTextView = findViewById(R.id.gym_trainees);
         gymTraineesLargeTextView = findViewById(R.id.gym_trainees_large);
         lottieGauge = findViewById(R.id.lottie_gauge);
+        navigateButton = findViewById(R.id.navigate_button);
+
+        // Request location permissions if not already granted
+        requestLocationPermission();
 
         // Set listener to know when the animation ends
         lottieGauge.addAnimatorListener(new Animator.AnimatorListener() {
@@ -60,6 +75,37 @@ public class GymStatusActivity extends AppCompatActivity {
 
         // Load gym data from Firebase
         loadGymData();
+
+        // Set up click listener for navigation button
+        navigateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (gymLatitude != null && gymLongitude != null) {
+                    openGoogleMaps(gymLatitude, gymLongitude);
+                } else {
+                    Log.e(TAG, "Gym location is not available.");
+                }
+            }
+        });
+    }
+
+    private void requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Location permission granted.");
+            } else {
+                Log.e(TAG, "Location permission denied.");
+            }
+        }
     }
 
     private void loadGymData() {
@@ -93,34 +139,41 @@ public class GymStatusActivity extends AppCompatActivity {
 
     private void loadGymDetails(String gymId) {
         // Reference to the specific gym's data in Firebase
-        DatabaseReference gymRef = FirebaseDatabase.getInstance().getReference("allGyms").child(gymId);
+        DatabaseReference gymRef = FirebaseDatabase.getInstance().getReference("allGyms");
 
-        gymRef.addValueEventListener(new ValueEventListener() {
+        // Query the gyms node to find the gym with the given gymId
+        gymRef.orderByChild("gymId").equalTo(gymId).addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    // Logging the entire snapshot
-                    Log.d(TAG, "Gym Data Snapshot: " + snapshot.getValue());
+                    for (DataSnapshot gymSnapshot : snapshot.getChildren()) {
+                        // Logging the entire snapshot
+                        Log.d(TAG, "Gym Data Snapshot: " + gymSnapshot.getValue());
 
-                    String gymName = snapshot.child("gymName").getValue(String.class);
-                    Long currentTrainees = snapshot.child("currentNumberOfTrainees").getValue(Long.class);
+                        String gymName = gymSnapshot.child("gymName").getValue(String.class);
+                        Long currentTrainees = gymSnapshot.child("currentNumberOfTrainees").getValue(Long.class);
+                        gymLatitude = gymSnapshot.child("latitude").getValue(Double.class);
+                        gymLongitude = gymSnapshot.child("longitude").getValue(Double.class);
 
-                    if (gymName != null) {
-                        gymNameTextView.setText(gymName);
-                    } else {
-                        gymNameTextView.setText("Gym Name not found");
-                    }
+                        if (gymName != null) {
+                            gymNameTextView.setText(gymName);
+                        } else {
+                            gymNameTextView.setText("Gym Name not found");
+                        }
 
-                    if (currentTrainees != null) {
-                        gymTraineesTextView.setText("Current Trainees:");
-                        gymTraineesLargeTextView.setText(String.valueOf(currentTrainees));
-                    } else {
-                        Log.e(TAG, "currentNumberOfTrainees is null");
-                        gymTraineesTextView.setText("Current Trainees: 0");
-                        gymTraineesLargeTextView.setText("0");
+                        if (currentTrainees != null) {
+                            gymTraineesTextView.setText("Current Trainees: ");
+                            gymTraineesLargeTextView.setText(String.valueOf(currentTrainees));
+                        } else {
+                            Log.e(TAG, "currentNumberOfTrainees is null");
+                            gymTraineesTextView.setText("Current Trainees:");
+                            gymTraineesLargeTextView.setText("0");
+                        }
                     }
                 } else {
-                    Log.e(TAG, "Snapshot does not exist.");
+                    Log.e(TAG, "Gym with the specified ID does not exist.");
+                    gymNameTextView.setText("Gym not found");
                 }
             }
 
@@ -133,5 +186,33 @@ public class GymStatusActivity extends AppCompatActivity {
 
 
 
-}
+    private boolean isGoogleMapsInstalled() {
+        try {
+            getPackageManager().getApplicationInfo("com.google.android.apps.maps", 0);
+            Log.d(TAG, "Google Maps is installed.");
+            return true;
+        } catch (PackageManager.NameNotFoundException e) {
+            Log.e(TAG, "Google Maps is not installed.");
+            return false;
+        }
+    }
 
+    private void openGoogleMaps(double latitude, double longitude) {
+        // Create the URI for navigation
+        String uri = "google.navigation:q=" + latitude + "," + longitude;
+
+        // Create an intent to launch Google Maps
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+
+        // Check if there's an app available to handle the intent
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        } else {
+            Log.e(TAG, "No app available to handle geo intent.");
+            // Optional: Redirect to Google Play Store to install Google Maps
+            Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.google.android.apps.maps"));
+            startActivity(playStoreIntent);
+        }
+    }
+
+}

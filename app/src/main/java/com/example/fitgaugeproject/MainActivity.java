@@ -119,14 +119,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void initalizeGyms() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference gymsRef = database.getReference("allGyms").child("e6edcdaa-4e56-4747-9c1e-307916bdd9c5");
+        DatabaseReference gymsRef = database.getReference("allGyms");
 
         gymsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!snapshot.exists()) {
+                    // The "allGyms" node doesn't exist, so add the first gym with index "gym1"
+                    String gymId = "gym1";
+
                     // Create a new Gym instance
                     Gym newGym = new Gym(
+                             // Gym ID
                             "winsport", // Gym name
                             32.1591775, // Latitude
                             34.9737333, // Longitude
@@ -135,18 +139,38 @@ public class MainActivity extends AppCompatActivity {
                     );
 
                     // Add the gym to the Firebase database
-                    gymsRef.setValue(newGym)
+                    gymsRef.child(gymId).setValue(newGym)
                             .addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
-                                    // Successfully added gym
                                     Toast.makeText(MainActivity.this, "Gym added successfully!", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    // Failed to add gym
                                     Toast.makeText(MainActivity.this, "Failed to add gym. Please try again.", Toast.LENGTH_SHORT).show();
                                 }
                             });
                 } else {
-                    Toast.makeText(MainActivity.this, "Gym already exists in the database.", Toast.LENGTH_SHORT).show();
+                    // If gyms already exist, find the next available gym index
+                    long gymCount = snapshot.getChildrenCount();
+                    String gymId = "gym" + (gymCount + 1);
+
+                    // Create a new Gym instance
+                    Gym newGym = new Gym(
+                             // Gym ID
+                            "winsport", // Gym name
+                            32.1591775, // Latitude
+                            34.9737333, // Longitude
+                            100, // Number of registered trainees
+                            0 // Current number of trainees
+                    );
+
+                    // Add the new gym to the Firebase database with the next available index
+                    gymsRef.child(gymId).setValue(newGym)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(MainActivity.this, "Gym added successfully!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(MainActivity.this, "Failed to add gym. Please try again.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 }
             }
 
@@ -156,4 +180,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }

@@ -53,4 +53,15 @@
         app:lottie_rawRes="@raw/loading_gym_animation"
         app:lottie_autoPlay="true"
         app:lottie_loop="false"/> <!-- Set loop to false for one-time play -->
+    <Button
+        android:id="@+id/navigate_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Navigate to My Gym"
+        android:layout_below="@+id/gym_trainees_large"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black" />
+
 </RelativeLayout>

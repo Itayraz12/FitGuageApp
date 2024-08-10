@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.fitgaugeproject.Models.Gym;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
@@ -17,11 +18,15 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -35,6 +40,7 @@ public class LoginActivity extends AppCompatActivity {
             }
     );
 
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -76,39 +82,61 @@ public class LoginActivity extends AppCompatActivity {
             // Successfully signed in
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            // After signing in, store the gymId
             if (user != null) {
-                String userId = user.getUid();
-                String gymId = "yourGymIdHere"; // Replace with the actual gym ID you want to associate with the user
-
-                // Get a reference to the Firebase database
-                DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
-
-                // Store the gymId under this user's profile
-                userRef.child("gymId").setValue(gymId)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                // Successfully stored gymId
-                                Toast.makeText(LoginActivity.this, "Gym ID saved successfully!", Toast.LENGTH_SHORT).show();
-                            } else {
-                                // Failed to store gymId
-                                Toast.makeText(LoginActivity.this, "Failed to save Gym ID. Please try again.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                checkAndCreateGym(user);
             }
-
-            // Now move to the MainActivity
-            transactToMainActivity();
         } else {
             // Handle sign-in failure
         }
     }
 
+    private void checkAndCreateGym(FirebaseUser user) {
+        DatabaseReference gymsRef = FirebaseDatabase.getInstance().getReference("allGyms");
+
+        gymsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists() || !snapshot.hasChildren()) {
+                    // No gyms exist, so create a new gym
+                    createNewGym(user);
+                } else {
+                    // Gyms exist, associate the user with an existing gym (could be a random selection or a specific gym)
+                    String existingGymId = snapshot.getChildren().iterator().next().getKey(); // Example: get the first gym ID
+                    saveUserGymAssociation(user.getUid(), existingGymId);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(LoginActivity.this, "Failed to check gyms: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void createNewGym(FirebaseUser user) {
+        String gymId = UUID.randomUUID().toString();
+        Gym newGym = new    Gym(
+                "New Gym", // Gym name
+                32.1591775, // Latitude
+                34.9737333, // Longitude
+                100, // Number of registered trainees
+                0 // Current number of trainees
+        );
+
+        DatabaseReference gymsRef = FirebaseDatabase.getInstance().getReference("allGyms").child(gymId);
+        gymsRef.setValue(newGym).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // Successfully added gym, associate it with the user
+                saveUserGymAssociation(user.getUid(), gymId);
+                Toast.makeText(LoginActivity.this, "New Gym created and associated!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(LoginActivity.this, "Failed to create Gym. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void saveUserGymAssociation(String userId, String gymId) {
-        // Save the gym ID in the user's profile
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference userRef = database.getReference("users").child(userId);
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
         userRef.child("gymId").setValue(gymId).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
