@@ -20,7 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.example.fitgaugeproject.Models.Gym;
 
 import java.util.ArrayList;
 
@@ -66,7 +65,11 @@ public class EditMyWorkoutsActivity extends AppCompatActivity {
     }
 
     private void loadWorkoutNames() {
-        DatabaseReference workoutsRef = FirebaseDatabase.getInstance().getReference("Week of workouts/allWorkouts");
+        DatabaseReference workoutsRef = FirebaseDatabase.getInstance()
+                .getReference("Training plans")
+                .child("Plan 1")
+                .child("week of workouts")
+                .child("allworkouts");
 
         workoutsRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -133,8 +136,10 @@ public class EditMyWorkoutsActivity extends AppCompatActivity {
 
         // Get a reference to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference exercisesRef = database.getReference("Week of workouts")
-                .child("allWorkouts")
+        DatabaseReference exercisesRef = database.getReference("Training plans")
+                .child("Plan 1")
+                .child("week of workouts")
+                .child("allworkouts")
                 .child(selectedWorkout)
                 .child("exercises");
 
@@ -163,24 +168,15 @@ public class EditMyWorkoutsActivity extends AppCompatActivity {
         });
     }
 
-
-
-//    private void setLabel(String string) {
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        DatabaseReference titleRef = database.getReference("title");
-//
-//        titleRef.setValue(string);
-//    }
-
     private void saveDataToFirebase() {
         // Write a message to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference WorkoutsRef = database.getReference("Week of workouts");
+        DatabaseReference workoutsRef = database.getReference("Training plans")
+                .child("Plan 1")
+                .child("week of workouts");
 
-        WorkoutsRef.setValue(DataManager.createWeekOfWorkouts());
+        workoutsRef.setValue(DataManager.createWeekOfWorkouts());
     }
-
-
 
     private void findViews() {
         main_BTN_submit = findViewById(R.id.main_BTN_updateWorkout);

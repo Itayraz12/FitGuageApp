@@ -1,31 +1,62 @@
 package com.example.fitgaugeproject.Models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
-public class workout {
+public class workout implements Serializable {
 
-        public enum WorkOutType{
-            TRX,
-            FUNCTIONAL_TRAINING,
-            STRENGTH_TRAINING,
-            HYBRID,
-            AEROBIC_TRAINING
-        }
+    public enum WorkOutType {
+        TRX,
+        FUNCTIONAL_TRAINING,
+        STRENGTH_TRAINING,
+        HYBRID,
+        AEROBIC_TRAINING
+    }
 
+    private String workoutName;
+    private String description;
+    private String imageUrl;
     private ArrayList<exercise> exercises;
     private WorkOutType type = WorkOutType.AEROBIC_TRAINING;
-
-
     private Boolean isDone = Boolean.FALSE;
-
 
     public workout() {
         exercises = new ArrayList<>();
     }
 
-    public Boolean getIsDone() {
+    public workout(String workoutName, WorkOutType type) {
+        this.workoutName = workoutName;
+        this.type = type;
+        this.exercises = new ArrayList<>();
+    }
 
+    public String getWorkoutName() {
+        return workoutName;
+    }
+
+    public void setWorkoutName(String workoutName) {
+        this.workoutName = workoutName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public workout setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public workout setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+        return this;
+    }
+
+    public Boolean getIsDone() {
         return isDone;
     }
 
@@ -47,6 +78,7 @@ public class workout {
         exercises.remove(exercise);
         return this;
     }
+
     public WorkOutType getType() {
         return type;
     }
@@ -57,20 +89,20 @@ public class workout {
     }
 
     public workout addExercise(String exerciseName, int numberOfSets, int numberOfRepetitions) {
-        exercise newExercise = new exercise();
-        newExercise.setExerciseName(exerciseName);
-        newExercise.setNumberOfSets(numberOfSets);
-        newExercise.setNumberOfRepetitions(numberOfRepetitions);
+        exercise newExercise = new exercise(exerciseName, numberOfSets, numberOfRepetitions);
         exercises.add(newExercise);
         return this;
     }
 
     @Override
     public String toString() {
-        return "workout{" +
-                "isDone=" + isDone +
+        return "Workout{" +
+                "workoutName='" + workoutName + '\'' +
+                ", description='" + description + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", type=" + type +
+                ", isDone=" + isDone +
                 ", exercises=" + exercises +
                 '}';
     }
 }
-
