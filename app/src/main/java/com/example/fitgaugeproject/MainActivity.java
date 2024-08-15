@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
         intent.setAction("com.example.fitgaugeproject.ACTION_GEOFENCE_EVENT"); // Explicit action
         geofencePendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-G
+
         return geofencePendingIntent;
     }
 
