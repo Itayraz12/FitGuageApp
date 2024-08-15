@@ -32,6 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/main_LBL_welcome"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black"
         android:layout_marginTop="16dp"
         android:text="My training plan" />
 
@@ -41,6 +43,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btn_training_plan"
         android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black"
         android:layout_marginTop="16dp"
         android:text="Edit my training plan" />
 
@@ -48,6 +52,8 @@
         android:id="@+id/btn_gym_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black"
         android:layout_below="@id/btn_edit_workouts"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
@@ -60,7 +66,7 @@
         android:layout_below="@id/btn_gym_status"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-
-        android:text="Logout"
-        android:textColor="@android:color/white" />
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black"
+        android:text="Logout" />
 </RelativeLayout>

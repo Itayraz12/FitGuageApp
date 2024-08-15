@@ -1,24 +1,34 @@
 package com.example.fitgaugeproject;
 
+import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.fitgaugeproject.Models.Gym;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -30,6 +40,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private static final String TAG = "MainActivity";
 
     private GeofencingClient geofencingClient;
     private ArrayList<Geofence> geofenceList;
@@ -49,40 +62,23 @@ public class MainActivity extends AppCompatActivity {
 
         findViews();
         initViews();
-        initalizeGyms();
+        setupGeofencing();
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                logout();
-            }
+        btnLogout.setOnClickListener(v -> logout());
+
+        btnTrainingPlan.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, TrainingPlanActivity.class);
+            startActivity(intent);
         });
 
-        btnTrainingPlan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to Training Plan Activity
-                Intent intent = new Intent(MainActivity.this, TrainingPlanActivity.class);
-                startActivity(intent);
-            }
+        btnEditPlan.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, EditMyWorkoutsActivity.class);
+            startActivity(intent);
         });
 
-        btnEditPlan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to Edit My Workouts Activity
-                Intent intent = new Intent(MainActivity.this, EditMyWorkoutsActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        btnGymStatus.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navigate to Gym Status Activity
-                Intent intent = new Intent(MainActivity.this, GymStatusActivity.class);
-                startActivity(intent);
-            }
+        btnGymStatus.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, GymStatusActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -112,9 +108,8 @@ public class MainActivity extends AppCompatActivity {
     private void logout() {
         AuthUI.getInstance()
                 .signOut(this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    public void onComplete(@NonNull Task<Void> task) {
-                        // User is now signed out
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
                         startLoginActivity();
                     }
                 });
@@ -126,68 +121,170 @@ public class MainActivity extends AppCompatActivity {
         finish();
     }
 
-    private void initalizeGyms() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference gymsRef = database.getReference("allGyms");
+    private void setupGeofencing() {
+        geofencingClient = LocationServices.getGeofencingClient(this);
+        geofenceList = new ArrayList<>();
 
-        gymsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    // The "allGyms" node doesn't exist, so add the first gym with index "gym1"
-                    String gymId = "gym1";
-
-                    // Create a new Gym instance
-                    Gym newGym = new Gym(
-                             // Gym ID
-                            "winsport", // Gym name
-                            32.1591775, // Latitude
-                            34.9737333, // Longitude
-                            100, // Number of registered trainees
-                            0 // Current number of trainees
-                    );
-
-                    // Add the gym to the Firebase database
-                    gymsRef.child(gymId).setValue(newGym)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(MainActivity.this, "Gym added successfully!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(MainActivity.this, "Failed to add gym. Please try again.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                } else {
-                    // If gyms already exist, find the next available gym index
-                    long gymCount = snapshot.getChildrenCount();
-                    String gymId = "gym" + (gymCount + 1);
-
-                    // Create a new Gym instance
-                    Gym newGym = new Gym(
-                             // Gym ID
-                            "winsport", // Gym name
-                            32.1591775, // Latitude
-                            34.9737333, // Longitude
-                            100, // Number of registered trainees
-                            0 // Current number of trainees
-                    );
-
-                    // Add the new gym to the Firebase database with the next available index
-                    gymsRef.child(gymId).setValue(newGym)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(MainActivity.this, "Gym added successfully!", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(MainActivity.this, "Failed to add gym. Please try again.", Toast.LENGTH_SHORT).show();
-                                }
-                            });
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String userGymId = snapshot.child("gymId").getValue(String.class);
+                    if (userGymId != null && !userGymId.isEmpty()) {
+                        setupGeofenceForUserGym(userGymId);
+                    } else {
+                        Toast.makeText(MainActivity.this, "No gym associated with user", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MainActivity.this, "Error checking gym existence: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "Error loading user data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
+    private void setupGeofenceForUserGym(String gymId) {
+        DatabaseReference gymsRef = FirebaseDatabase.getInstance().getReference("allGyms");
+
+        gymsRef.orderByChild("gymId").equalTo(gymId)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            for (DataSnapshot gymSnapshot : snapshot.getChildren()) {
+                                Gym gym = gymSnapshot.getValue(Gym.class);
+                                if (gym != null) {
+                                    geofenceList.add(new Geofence.Builder()
+                                            .setRequestId(gym.getGymId()) // Unique ID for each geofence
+                                            .setCircularRegion(
+                                                    gym.getLatitude(),
+                                                    gym.getLongitude(),
+                                                    200 // Radius in meters
+                                            )
+                                            .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                                            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                                            .build());
+
+                                    // Add geofence to the geofencing client
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                        addGeofences();
+                                    } else {
+                                        addGeofencesForPreQ();
+                                    }
+                                }
+                            }
+                        } else {
+                            Toast.makeText(MainActivity.this, "Gym not found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(MainActivity.this, "Error loading gym data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    private void addGeofences() {
+        if (geofenceList.isEmpty()) return;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request location permissions if they are not granted
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            }, REQUEST_LOCATION_PERMISSION);
+            return;
+        }
+
+        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(MainActivity.this, "Geofences added successfully", Toast.LENGTH_SHORT).show();
+                    Log.d("GeofenceBroadcastReceiver", "Geofencing successful: " + getGeofencingRequest() + getGeofencePendingIntent());
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MainActivity.this, "Failed to add geofences", Toast.LENGTH_SHORT).show();
+                    Log.e("GeofenceBroadcastReceiver", "Failed to add geofences", e);
+                });
+    }
+
+    // For devices with API level < Q
+    private void addGeofencesForPreQ() {
+        if (geofenceList.isEmpty()) return;
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Request location permissions if they are not granted
+            ActivityCompat.requestPermissions(this, new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION
+            }, REQUEST_LOCATION_PERMISSION);
+            return;
+        }
+
+        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(MainActivity.this, "Geofences added successfully", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Geofencing successful: " + getGeofencingRequest() + getGeofencePendingIntent());
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(MainActivity.this, "Failed to add geofences", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Failed to add geofences", e);
+                });
+    }
+
+    private GeofencingRequest getGeofencingRequest() {
+        return new GeofencingRequest.Builder()
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .addGeofences(geofenceList)
+                .build();
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        if (geofencePendingIntent != null) {
+            return geofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        intent.setAction("com.example.fitgaugeproject.ACTION_GEOFENCE_EVENT"); // Explicit action
+        geofencePendingIntent = PendingIntent.getBroadcast(this, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+G
+        return geofencePendingIntent;
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_LOCATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    addGeofences();
+                } else {
+                    addGeofencesForPreQ();
+                }
+            } else {
+                Toast.makeText(this, "Location permissions are required for geofencing", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void requestIgnoreBatteryOptimizations() {
+        Intent intent = new Intent();
+        String packageName = getPackageName();
+
+        if (!Settings.canDrawOverlays(this)) {
+            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            startActivity(intent);
+        } else {
+            intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:" + packageName));
+            startActivity(intent);
+        }
+    }
 }
+

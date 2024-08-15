@@ -100,9 +100,10 @@ public class LoginActivity extends AppCompatActivity {
                     // No gyms exist, so create a new gym
                     createNewGym(user);
                 } else {
-                    // Gyms exist, associate the user with an existing gym (could be a random selection or a specific gym)
-                    String existingGymId = snapshot.getChildren().iterator().next().getKey(); // Example: get the first gym ID
-                    saveUserGymAssociation(user.getUid(), existingGymId);
+                    // Gyms exist, associate the user with the first gym's actual gymId
+                    DataSnapshot firstGymSnapshot = snapshot.getChildren().iterator().next();
+                    String actualGymId = firstGymSnapshot.child("gymId").getValue(String.class);
+                    saveUserGymAssociation(user.getUid(), actualGymId);
                 }
             }
 
@@ -112,6 +113,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 
     private void createNewGym(FirebaseUser user) {
         String gymId = UUID.randomUUID().toString();

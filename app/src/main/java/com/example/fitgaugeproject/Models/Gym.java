@@ -10,6 +10,11 @@ public class Gym {
     private int numberOfRegisteredTrainees;
     private int currentNumberOfTrainees;
 
+    // No-argument constructor
+    public Gym() {
+    }
+
+
     // Constructor for creating a new gym with generated gymId
     public Gym(String gymName, double latitude, double longitude, int numberOfRegisteredTrainees, int currentNumberOfTrainees) {
         this.gymId = UUID.randomUUID().toString(); // Generate a unique ID
