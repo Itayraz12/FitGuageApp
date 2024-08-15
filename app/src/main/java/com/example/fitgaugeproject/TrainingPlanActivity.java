@@ -2,7 +2,6 @@ package com.example.fitgaugeproject;
 
 import android.os.Bundle;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -73,6 +72,13 @@ public class TrainingPlanActivity extends AppCompatActivity {
                         for (DataSnapshot exerciseSnapshot : exercisesSnapshot.getChildren()) {
                             exercise exerciseItem = exerciseSnapshot.getValue(exercise.class);
                             if (exerciseItem != null) {
+                                // Get YouTube link and Lottie animation reference
+                                String youtubeUrl = exerciseSnapshot.child("youtubeUrl").getValue(String.class);
+                                String animationResId = exerciseSnapshot.child("animationResId").getValue(String.class);
+
+                                exerciseItem.setYoutubeUrl(youtubeUrl != null ? youtubeUrl : "");
+                                exerciseItem.setAnimationResId(animationResId != null ? animationResId : "");
+
                                 workoutItem.addExercise(exerciseItem);
                             }
                         }
@@ -90,4 +96,5 @@ public class TrainingPlanActivity extends AppCompatActivity {
             }
         });
     }
+
 }

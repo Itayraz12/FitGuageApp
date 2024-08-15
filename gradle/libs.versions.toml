@@ -22,6 +22,7 @@ navigationUi = "2.6.0"
 gs = "4.4.2"
 activity = "1.9.0"
 speedviewlib = "1.5.4"
+playServicesLocation = "21.3.0"
 
 [libraries]
 anychart-android = { module = "com.anychart:anychart-android", version.ref = "anychartAndroid" }
@@ -47,6 +48,7 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 speedviewlib = { module = "com.github.anastr:speedviewlib", version.ref = "speedviewlib" }
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

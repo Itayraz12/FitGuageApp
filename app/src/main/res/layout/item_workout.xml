@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="wrap_content">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/workout_card_view"
@@ -23,42 +23,75 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- ImageView with adjusted scale type to fit the image -->
             <ImageView
                 android:id="@+id/workout_image"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
-                android:scaleType="centerCrop"
-                tools:src="@drawable/image_placeholder" />
+                android:layout_height="200dp"
+                android:scaleType="fitXY"
+            tools:src="@drawable/image_placeholder" />
 
+            <!-- Centered and larger workout name -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/workout_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Workout Name"
-                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:textSize="24sp"
                 android:textStyle="bold"
-                android:layout_marginTop="8dp"/>
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:textAppearance="?attr/textAppearanceHeadline6"/>
+
+            <!-- Subtitle for workout type -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/workout_type_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Workout Type:"
+                android:layout_marginTop="12dp"
+                android:textStyle="italic"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Workout type text -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/workout_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Status"
+                android:text="Type"
                 android:layout_marginTop="4dp"
-                android:textAppearance="?attr/textAppearanceBody2"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:layout_gravity="center_horizontal"/>
 
+            <!-- Subtitle for workout status -->
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/workout_status_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status:"
+                android:layout_marginTop="12dp"
+                android:textStyle="italic"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:layout_gravity="center_horizontal"/>
+
+            <!-- Workout status text -->
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/workout_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Status"
                 android:layout_marginTop="4dp"
-                android:textAppearance="?attr/textAppearanceBody2"/>
+                android:textAppearance="?attr/textAppearanceSubtitle1"
+                android:layout_gravity="center_horizontal"/>
 
+            <!-- RecyclerView for exercises -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/exercises_recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:nestedScrollingEnabled="false"/>
+                android:nestedScrollingEnabled="false"
+                android:layout_marginTop="16dp"/>
 
         </LinearLayout>
 

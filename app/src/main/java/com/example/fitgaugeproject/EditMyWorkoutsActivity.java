@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.fitgaugeproject.Data.DataManager;
 import com.example.fitgaugeproject.Models.exercise;
 import com.example.fitgaugeproject.Models.week;
+import com.example.fitgaugeproject.enums.ExerciseMapping;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
@@ -128,11 +129,21 @@ public class EditMyWorkoutsActivity extends AppCompatActivity {
         int numberOfSets = Integer.parseInt(main_ET_text_sets.getText().toString());
         int numberOfRepetitions = Integer.parseInt(main_ET_text_repetitions.getText().toString());
 
+        // Use ExerciseMapping enum to get corresponding YouTube URL and animation resource ID
+        ExerciseMapping mapping = ExerciseMapping.getByExerciseName(exerciseName);
+        if (mapping == null) {
+            // Handle case where the exercise name does not match any in the enum
+            Toast.makeText(this, "Exercise not recognized. Please enter a valid exercise name.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Create a new exercise object
         exercise newExercise = new exercise();
         newExercise.setExerciseName(exerciseName);
         newExercise.setNumberOfSets(numberOfSets);
         newExercise.setNumberOfRepetitions(numberOfRepetitions);
+        newExercise.setYoutubeUrl(mapping.getYoutubeUrl());
+        newExercise.setAnimationResId(mapping.getAnimationResId());
 
         // Get a reference to the database
         FirebaseDatabase database = FirebaseDatabase.getInstance();

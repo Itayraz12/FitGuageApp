@@ -2,11 +2,11 @@ package com.example.fitgaugeproject.Models;
 
 public class exercise {
 
-    private String exerciseName = "";
-    private int numberOfSets ;
-    private int numberOfRepetitions ;
-
-
+    private String exerciseName;
+    private int numberOfSets;
+    private int numberOfRepetitions;
+    private String youtubeUrl;
+    private String animationResId;
 
 
     public exercise(){
@@ -17,6 +17,23 @@ public class exercise {
         this.exerciseName = exerciseName;
         this.numberOfSets = numberOfSets;
         this.numberOfRepetitions = numberOfRepetitions;
+    }
+
+
+    public String getYoutubeUrl() {
+        return youtubeUrl;
+    }
+
+    public void setYoutubeUrl(String youtubeUrl) {
+        this.youtubeUrl = youtubeUrl;
+    }
+
+    public String getAnimationResId() {
+        return animationResId;
+    }
+
+    public void setAnimationResId(String animationResId) {
+        this.animationResId = animationResId;
     }
 
     public String getExerciseName() {
