@@ -3,6 +3,7 @@ package com.example.fitgaugeproject;
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -35,6 +37,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -55,14 +59,20 @@ public class MainActivity extends AppCompatActivity {
     private ImageView main_IMG_image;
     private TextView main_LBL_welcome;
 
+
+    private static final String PREFS_NAME = "FitGaugePrefs";
+    private static final String KEY_WORKOUT_DIALOG_SHOWN_V1 = "workoutDialogShown_v1";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        clearSharedPreferences(); // Temporary for testing
         findViews();
         initViews();
-        setupGeofencing();
+
+        // Check and show the workout alert dialog
+        showWorkoutAlertDialogIfNecessary();
 
         btnLogout.setOnClickListener(v -> logout());
 
@@ -104,6 +114,116 @@ public class MainActivity extends AppCompatActivity {
                     .into(main_IMG_image);
         }
     }
+
+    private void showWorkoutAlertDialogIfNecessary() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean dialogShown = prefs.getBoolean(KEY_WORKOUT_DIALOG_SHOWN_V1, false);
+
+        if (!dialogShown) {
+            showWorkoutAlertDialog();
+            prefs.edit().putBoolean(KEY_WORKOUT_DIALOG_SHOWN_V1, true).apply();
+        }
+    }
+
+    private void clearSharedPreferences() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().clear().apply();
+        Log.d(TAG, "SharedPreferences cleared.");
+    }
+
+
+
+    private void showWorkoutAlertDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Workout")
+                .setMessage("Are you starting a workout?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Handle positive response
+                    incrementTraineesInGym();
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // Handle negative response
+                    Toast.makeText(this, "No workout started.", Toast.LENGTH_SHORT).show();
+                })
+                .setCancelable(false) // Prevent dialog from being dismissed by tapping outside
+                .show();
+    }
+
+    private void incrementTraineesInGym() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String userId = user.getUid();
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(userId);
+
+            // Retrieve the user's gymId
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    String userGymId = snapshot.child("gymId").getValue(String.class);
+                    if (userGymId != null && !userGymId.isEmpty()) {
+                        DatabaseReference gymsRef = FirebaseDatabase.getInstance().getReference("allGyms");
+
+                        // Query the gyms to find the one with the matching gymId
+                        gymsRef.orderByChild("gymId").equalTo(userGymId)
+                                .addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                        if (snapshot.exists()) {
+                                            // Assuming there's only one gym with this gymId
+                                            for (DataSnapshot gymSnapshot : snapshot.getChildren()) {
+                                                DatabaseReference gymRef = gymSnapshot.getRef().child("currentNumberOfTrainees");
+
+                                                // Increment the currentNumberOfTrainees
+                                                gymRef.runTransaction(new Transaction.Handler() {
+                                                    @NonNull
+                                                    @Override
+                                                    public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                                        Integer currentValue = currentData.getValue(Integer.class);
+                                                        if (currentValue == null) {
+                                                            currentData.setValue(1);
+                                                        } else {
+                                                            currentData.setValue(currentValue + 1);
+                                                        }
+                                                        return Transaction.success(currentData);
+                                                    }
+
+                                                    @Override
+                                                    public void onComplete(DatabaseError databaseError, boolean committed, DataSnapshot currentData) {
+                                                        if (committed) {
+                                                            Toast.makeText(MainActivity.this, "Trainee count updated.", Toast.LENGTH_SHORT).show();
+                                                        } else {
+                                                            Toast.makeText(MainActivity.this, "Failed to update trainee count.", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        } else {
+                                            Toast.makeText(MainActivity.this, "Gym not found.", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError error) {
+                                        Toast.makeText(MainActivity.this, "Error loading gym data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(MainActivity.this, "No gym associated with user.", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "Error loading user data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "User not logged in.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+
 
     private void logout() {
         AuthUI.getInstance()
@@ -287,4 +407,3 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
-
