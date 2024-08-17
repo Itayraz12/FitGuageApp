@@ -42,6 +42,12 @@
             android:name=".LoginActivity"
             android:exported="true" />
         <activity
+            android:name=".AddWorkoutActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ChooseEditWorkout"
+            android:exported="true" />
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"

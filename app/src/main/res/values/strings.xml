@@ -10,6 +10,14 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <string-array name="workout_types">
+        <item>TRX</item>
+        <item>FUNCTIONAL_TRAINING</item>
+        <item>STRENGTH_TRAINING</item>
+        <item>HYBRID</item>
+        <item>AEROBIC_TRAINING</item>
+    </string-array>
+
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
@@ -53,4 +61,10 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="choose_workout">Choose Workout</string>
+    <string name="add_new_exercise">Add new exercise</string>
+    <string name="submit_new_exercise">Submit new exercise</string>
+    <string name="add_exercise">Add Exercise</string>
+    <string name="save_workout">Save Workout</string>
+    <string name="enter_workout_name">Enter workout name</string>
+    <string name="exercises">Exercises</string>
 </resources>

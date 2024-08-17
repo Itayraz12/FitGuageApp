@@ -14,11 +14,11 @@
         android:id="@+id/main_LBL_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add new exercise"
+        android:text="@string/add_new_exercise"
         android:gravity="center"
         android:textSize="30sp"
         android:textStyle="bold"
-        android:layout_marginVertical="10dp"
+        android:layout_marginVertical="12dp"
         android:textColor="@color/amber_300" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -141,13 +141,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="10dp"
-        android:text="Submit new exercise" />
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black"
+        android:text="@string/submit_new_exercise" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/main_BTN_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginVertical="10dp"
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black"
         android:text="Back" />
 
 

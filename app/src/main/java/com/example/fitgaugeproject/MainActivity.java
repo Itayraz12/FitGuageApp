@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnEditPlan.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, EditMyWorkoutsActivity.class);
+            Intent intent = new Intent(MainActivity.this, ChooseEditWorkout.class);
             startActivity(intent);
         });
 

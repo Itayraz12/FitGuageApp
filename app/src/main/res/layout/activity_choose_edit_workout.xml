@@ -1,0 +1,42 @@
+<!-- res/layout/activity_choose_edit_workout.xml -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@drawable/background_image">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/title_choose_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose an Option"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/amber_300"
+        android:gravity="center"
+        android:layout_marginBottom="32dp" />
+
+    <!-- Add Workout Button -->
+    <Button
+        android:id="@+id/btn_add_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Workout"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black" />
+
+    <!-- Edit Workouts Button -->
+    <Button
+        android:id="@+id/btn_edit_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Edit Workouts"
+        android:backgroundTint="@color/amber_300"
+        android:textColor="@android:color/black" />
+
+</LinearLayout>
